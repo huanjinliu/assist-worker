@@ -1,0 +1,41 @@
+{
+  "name": "assist-worker",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development npm run watch --silent",
+    "build": "rollup --config",
+    "watch": "rollup --config -w --silent",
+    "build:type": "tsc",
+    "prettier": "prettier --write . --loglevel silent"
+  },
+  "type": "module",
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.21.3",
+    "@babel/preset-env": "^7.20.2",
+    "@rollup/plugin-babel": "^6.0.3",
+    "@rollup/plugin-commonjs": "^24.0.1",
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "@rollup/plugin-typescript": "^11.0.0",
+    "@typescript-eslint/eslint-plugin": "5.36.2",
+    "@typescript-eslint/parser": "5.36.2",
+    "cross-env": "^7.0.3",
+    "eslint": "^8.23.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "prettier": "^2.8.7",
+    "rollup": "^3.20.2",
+    "rollup-plugin-clear": "^2.0.7",
+    "rollup-plugin-livereload": "^2.0.5",
+    "rollup-plugin-serve": "^2.0.2",
+    "tslib": "^2.5.0",
+    "typescript": "^5.0.2"
+  },
+  "brower": "dist/assistWorker.js",
+  "module": "dist/assistWorker.esm.js",
+  "dependencies": {
+    "acorn": "^8.8.2"
+  }
+}
