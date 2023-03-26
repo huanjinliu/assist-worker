@@ -36,6 +36,6 @@
   "brower": "dist/assistWorker.js",
   "module": "dist/assistWorker.esm.js",
   "dependencies": {
-    "acorn": "^8.8.2"
+    "greenlet": "^1.1.0"
   }
 }

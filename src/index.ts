@@ -1,88 +1,73 @@
-import { parse } from 'acorn';
-
-/**
- * 查找一段脚本所有变量
- * @param script 脚本
- * @returns 所有变量
- */
-const findAllVariables = (script: string) => {
-  const ast = parse(script, { ecmaVersion: 6 });
-  const variables = new Set<string>();
-  const traverse = (node: any) => {
-    if (!node) return;
-    if ('type' in node && node.type === 'Identifier') {
-      variables.add(node.name);
-    }
-    for (let key in node) {
-      if (typeof node[key] !== 'object') continue;
-
-      if (Array.isArray(node[key])) {
-        node[key].forEach(traverse);
-      } else traverse(node[key]);
-    }
-  };
-  traverse(ast);
-
-  return Array.from(variables);
-};
-
 const createAssistWorker = () => {
-  // 收集所有的worker脚本
+  // 收集所有的worker脚本执行凭证
   const workers: {
-    worker: Worker;
-    scriptBlobURL: string;
     done: (error?: Error, result?: any) => void;
   }[] = [];
   // 收集所有脚本需要的变量
-  const variables: Map<string, { type: string; value: any }> = new Map();
+  const variables: Map<string, any> = new Map();
   // 收集所有脚本需要的方法
   const functions: Map<string, string> = new Map();
+  // 信息接收器
+  let onMessage: ((message: any) => void) | undefined;
 
-  const execute = (func: any) => {
+  // 是否是转让数值，可以做到零拷贝
+  const isTransferables  = (value: any) =>
+    value instanceof ArrayBuffer ||
+    value instanceof MessagePort ||
+    (self.ImageBitmap && value instanceof ImageBitmap)
+
+  const create = (func: any) => {
     // 核心脚本
     const majorScript = func.toString();
 
     // 组合成worker脚本
     const workerScript = `
       /** 注册数据源 */
-      $data=JSON.parse('${JSON.stringify(Object.fromEntries(variables))}');
+      $data={};
 
-      /** 注册方法 */
+      /** 注册函数 */
       ${Object.entries(Object.fromEntries(functions)).reduce(
         (apiScript, [key, funcStr], index, arr) => {
-          return apiScript + `${key}=${funcStr};${index !== arr.length - 1 ? '\n' : ''}`;
+          return (
+            apiScript +
+            `${key}=${funcStr};${index !== arr.length - 1 ? "\n" : ""}`
+          );
         },
-        ''
+        ""
       )}
 
-      /** 设置数据源getter响应 */
-      for (let variable in $data) {
-        Object.defineProperty(globalThis, variable, {
-          get() {
-            const { type, value } = $data[variable];
-
-            if (type === 'function') return (...args) => {
-              postMessage({ action: 'request', id: variable, arguments: args })
-            }
-
-            return value;
-          }
-        });
-      }
+      /** 注册判断是否是转让值函数 */
+      $isTransferables = ${isTransferables}
 
       /** 执行核心脚本 */
       $script=${majorScript};
       onmessage=e=>{
-        if (e.data.action === 'init') {
-          const { id, arguments } = e.data;
-          const result = $script.apply($script, arguments);
+        const action = e.data.action;
+        if (action === 'init') {
+          $data = e.data.variables;
+
+          // 设置数据源getter响应
+          for (let variable in $data) {
+            Object.defineProperty(globalThis, variable, {
+              get() { return $data[variable]; }
+            });
+          }
+        }
+
+        if (action === 'execute') {
+          const { index, arguments } = e.data;
+          const result = $script.apply($script, arguments.concat([{
+            postMessage: (message) => postMessage({ action: 'message', message }),
+            close: self.close,
+          }]));
           const isPromise = typeof result === 'object' && 'then' in result;
+          
           if (isPromise) {
             result
-              .then((asyncResult) => postMessage({ action: 'callback', id, value: asyncResult }))
-              .catch((error) => postMessage({ action: 'callback', id, value: undefined, error }))
+              .then((asyncResult) => postMessage({ action: 'callback', index, value: asyncResult }, [asyncResult].filter($isTransferables)))
+              .catch((error) => postMessage({ action: 'callback', index, value: undefined, error }))
           }
-          else postMessage({ action: 'callback', id, value: result })
+          else postMessage({ action: 'callback', index, value: result }, [result].filter($isTransferables))
         }
       }
     `;
@@ -92,59 +77,65 @@ const createAssistWorker = () => {
     // 主线程下创建worker线程
     const worker = new Worker(workerURL);
 
+    // 初始worker线程内的变量
+    const variablesObject = Object.fromEntries(variables);
+    worker.postMessage(
+      { action: "init", variables: variablesObject },
+      Object.values(variablesObject).filter(isTransferables)
+    );
+
     // 监听接收worker线程发的消息
     worker.onmessage = function (e) {
       const data = e.data as
         | {
-            action: 'callback';
-            id: number;
+            action: "callback";
+            index: number;
             value: any;
             error: any;
           }
         | {
-            action: 'request';
-            id: string;
-            arguments: any[];
+            action: "message";
+            message: any;
           };
 
-      switch (data.action) {
-        case 'request': {
-          const func = variables.get(data.id)?.value;
+      if (data.action === "message") {
+        if (onMessage) onMessage.call(onMessage, data.message);
+      }
 
-          if (func) {
-            const result = func.apply(func, data.arguments);
-            worker.postMessage({
-              type: data.action,
-              id: data.id,
-              value: result
-            });
-          }
-          break;
-        }
-        case 'callback': {
-          const { worker, done, scriptBlobURL } = workers[data.id];
+      if (data.action === "callback") {
+        const { done } = workers[data.index];
 
-          done(data.error, data.value);
-          worker.terminate();
-          URL.revokeObjectURL(scriptBlobURL);
-        }
+        done(data.error, data.value);
       }
     };
 
-    return (...args) => {
-      return new Promise((resolve, reject) => {
-        const id = workers.length;
-        workers.push({
-          worker,
-          scriptBlobURL: workerURL,
-          done: (error, result) => {
-            if (error) reject(error);
-            if (result) resolve(result);
-          }
+    return {
+      run: (...args) => {
+        return new Promise((resolve, reject) => {
+          const index = workers.length;
+          workers.push({
+            done: (error, result) => {
+              if (error) reject(error);
+              else resolve(result);
+            },
+          });
+          worker.postMessage(
+            { action: "execute", index, arguments: args },
+            args.filter(isTransferables)
+          );
         });
-        worker.postMessage({ id, action: 'init', arguments: args });
-      });
-    };
+      },
+      terminate: () => {
+        worker.terminate();
+        URL.revokeObjectURL(workerURL);
+
+        // 清空数据
+        workers.length = 0;
+        variables.clear();
+        functions.clear();
+        onMessage = undefined;
+      }
+    }
   };
 
   const worker = {
@@ -153,20 +144,16 @@ const createAssistWorker = () => {
         const value = data[key];
         const type = typeof value;
 
-        if (type === 'function') functions.set(key, value.toString());
-        else variables.set(key, { type, value });
+        if (type === "function") functions.set(key, value.toString());
+        else variables.set(key, value);
       }
       return worker;
     },
-    request: (data: Record<string, any>) => {
-      for (let key in data) {
-        const value = data[key];
-        const type = typeof value;
-        variables.set(key, { type, value });
-      }
+    onMessage: (handler: (message: any) => void) => {
+      onMessage = handler;
       return worker;
     },
-    execute
+    create,
   };
 
   return worker;
