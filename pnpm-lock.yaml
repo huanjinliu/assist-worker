@@ -13,7 +13,6 @@ specifiers:
   eslint: ^8.23.0
   eslint-config-prettier: ^8.5.0
   eslint-plugin-prettier: ^4.2.1
-  greenlet: ^1.1.0
   prettier: ^2.8.7
   rollup: ^3.20.2
   rollup-plugin-clear: ^2.0.7
@@ -21,9 +20,6 @@ specifiers:
   rollup-plugin-serve: ^2.0.2
   tslib: ^2.5.0
   typescript: ^5.0.2
-
-dependencies:
-  greenlet: 1.1.0
 
 devDependencies:
   '@babel/core': 7.21.3
@@ -2146,10 +2142,6 @@ packages:
   /grapheme-splitter/1.0.4:
     resolution: {integrity: sha512-bzh50DW9kTPM00T8y4o8vQg89Di9oLJVLW/KaOGIXJWP/iqCN6WKYkbNOF04vFLJhwcpYUh9ydh/+5vpOqV4YQ==}
     dev: true
-
-  /greenlet/1.1.0:
-    resolution: {integrity: sha512-W/kKzq7ZSF/LFItIjaSaccw8L6js+9SMSS5buXZs/Td7qZAT91Kd0LTxuUjSWDwuyv4MPo/fhZdkRLV1zsuClg==}
-    dev: false
 
   /has-flag/3.0.0:
     resolution: {integrity: sha512-sKJf1+ceQBr4SMkvQnBDNDtf4TXpVhVGateu0t918bl30FnbE2m4vNLX+VWe/dpjlb+HugGYzW7uQXH98HPEYw==}

@@ -6,7 +6,7 @@ import serve from 'rollup-plugin-serve';
 import livereload from 'rollup-plugin-livereload';
 
 const config = {
-  input: 'src/web/index.ts',
+  input: 'src/example/index.ts',
   output: [
     {
       file: 'public/index.js',

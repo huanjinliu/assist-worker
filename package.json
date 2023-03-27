@@ -1,17 +1,26 @@
 {
   "name": "assist-worker",
   "version": "1.0.0",
-  "description": "",
+  "description": "providing minimal APIs to allow you to use Web Workers more flexibly in your code.",
+  "keywords": [
+    "assist worker",
+    "thread",
+    "async",
+    "worker",
+    "web worker"
+  ],
+  "author": "huanjin",
+  "homepage": "https://github.com/huanjinliu/assist-worker#readme",
   "scripts": {
     "dev": "cross-env NODE_ENV=development npm run watch --silent",
     "build": "rollup --config",
     "watch": "rollup --config -w --silent",
-    "build:type": "tsc",
     "prettier": "prettier --write . --loglevel silent"
   },
   "type": "module",
-  "author": "",
-  "license": "ISC",
+  "brower": "dist/assistWorker.js",
+  "module": "dist/assistWorker.esm.js",
+  "types": "dist/index.d.ts",
   "devDependencies": {
     "@babel/core": "^7.21.3",
     "@babel/preset-env": "^7.20.2",
@@ -33,9 +42,5 @@
     "tslib": "^2.5.0",
     "typescript": "^5.0.2"
   },
-  "brower": "dist/assistWorker.js",
-  "module": "dist/assistWorker.esm.js",
-  "dependencies": {
-    "greenlet": "^1.1.0"
-  }
+  "license": "MIT"
 }
