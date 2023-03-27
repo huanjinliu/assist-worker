@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "es2017",
     "lib": ["dom", "ES2021"],
+    "moduleResolution": "node",
     "declaration": true,
     "emitDeclarationOnly": true,
     "outDir": "./dist",
@@ -11,5 +12,6 @@
     "noImplicitAny": false,
     "noImplicitThis": false,
     "skipLibCheck": true
-  }
+  },
+  "exclude": ["src/example"]
 }
