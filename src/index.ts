@@ -2,6 +2,14 @@ const WORKER_MESSAGE = 'WORKER_MESSAGE' as const;
 const JOB_RESULT = 'JOB_RESULT' as const;
 
 /**
+ * worker线程内部操作方法
+ */
+export type WorkerMethods = {
+  postMessage?: Worker['postMessage'];
+  close?: () => void;
+}
+
+/**
  * Web Workers辅助者，提供极少API使你能更灵活地在编码中使用Web Workers
  */
 type AssistWorker = {
@@ -26,7 +34,7 @@ type AssistWorker = {
     job: T
   ) => {
     run: (
-      ...args: Parameters<T> extends [...infer P, infer Q] ? P : never
+      ...args: Parameters<T> extends [...infer P, infer Q] ? Q extends WorkerMethods ? P : [...P, Q] : never
     ) => Promise<ReturnType<T>>;
     terminate: () => void;
   };
@@ -137,10 +145,8 @@ const createAssistWorker = () => {
        * @param {...any} args 动态参数
        * @returns {Promise<any>} 工作流程执行结果
        */
-      const run = (
-        ...args: Parameters<T> extends [...infer P, infer Q] ? P : never
-      ) => {
-        return new Promise<ReturnType<T>>((resolve, reject) => {
+      const run = (...args) => {
+        return new Promise((resolve, reject) => {
           const index = jobs.length;
           jobs.push({
             done: (error, result) => {
