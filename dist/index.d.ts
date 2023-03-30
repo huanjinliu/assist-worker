@@ -31,5 +31,6 @@ type AssistWorker = {
         terminate: () => void;
     };
 };
+export declare const createWorker: (creator: (assist: any) => void) => void;
 declare const _default: AssistWorker;
 export default _default;

@@ -7,7 +7,7 @@ const JOB_RESULT = 'JOB_RESULT';
 export type WorkerMethods = {
   postMessage?: Worker['postMessage'];
   close?: () => void;
-}
+};
 
 /**
  * Web Workers辅助者，提供极少API使你能更灵活地在编码中使用Web Workers
@@ -34,7 +34,11 @@ type AssistWorker = {
     job: T
   ) => {
     run: (
-      ...args: Parameters<T> extends [...infer P, infer Q] ? Q extends WorkerMethods ? P : Parameters<T> : never
+      ...args: Parameters<T> extends [...infer P, infer Q]
+        ? Q extends WorkerMethods
+          ? P
+          : Parameters<T>
+        : never
     ) => Promise<ReturnType<T>>;
     terminate: () => void;
   };
@@ -178,6 +182,39 @@ const createAssistWorker = () => {
   };
 
   return assistWorker;
+};
+
+// 获取函数的参数
+const getParameters = (fn: (...args: any) => any) => {
+  if (typeof fn !== 'function') return [];
+
+  // 获取代码片段
+  const fnStr = fn
+    .toString()
+    // 移除注释
+    .replace(/((\/\/.*$)|(\/\*[\s\S]*?\*\/))/gm, '')
+    .trim();
+
+  // 根据函数类型（普通/箭头）使用不同的匹配方法匹配参数配置片段
+  const args = fnStr.match(
+    fnStr.startsWith('function')
+      // 普通函数
+      ? /^function.*?\(([^)]*)\)/
+      // 箭头函数
+      : /^\(?([^)]*)\)?.*?=>/
+  );
+
+  if (!args) return [];
+
+  return args[1]
+    .split(',')
+    .map((arg) => arg.replace(/\/\*.*\*\//, '').trim())
+    .filter(Boolean);
+};
+
+export const createWorker = (creator: (assist: any) => void) => {
+  const [assistName] = getParameters(creator);
+  console.log(assistName);
 };
 
 export default createAssistWorker();

@@ -115,6 +115,33 @@ const createAssistWorker = () => {
     };
     return assistWorker;
 };
+// 获取函数的参数
+const getParameters = (fn) => {
+    if (typeof fn !== 'function')
+        return [];
+    // 获取代码片段
+    const fnStr = fn
+        .toString()
+        // 移除注释
+        .replace(/((\/\/.*$)|(\/\*[\s\S]*?\*\/))/gm, '')
+        .trim();
+    // 根据函数类型（普通/箭头）使用不同的匹配方法匹配参数配置片段
+    const args = fnStr.match(fnStr.startsWith('function')
+        // 普通函数
+        ? /^function.*?\(([^)]*)\)/
+        // 箭头函数
+        : /^\(?([^)]*)\)?.*?=>/);
+    if (!args)
+        return [];
+    return args[1]
+        .split(',')
+        .map((arg) => arg.replace(/\/\*.*\*\//, '').trim())
+        .filter(Boolean);
+};
+const createWorker = (creator) => {
+    const [assistName] = getParameters(creator);
+    console.log(assistName);
+};
 var index = createAssistWorker();
 
-export { index as default };
+export { createWorker, index as default };

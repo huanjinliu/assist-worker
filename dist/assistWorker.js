@@ -1,8 +1,8 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-  typeof define === 'function' && define.amd ? define(factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.assistWorker = factory());
-})(this, (function () { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+  typeof define === 'function' && define.amd ? define(['exports'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.assistWorker = {}));
+})(this, (function (exports) { 'use strict';
 
   const WORKER_MESSAGE = 'WORKER_MESSAGE';
   const JOB_RESULT = 'JOB_RESULT';
@@ -121,8 +121,38 @@
       };
       return assistWorker;
   };
+  // 获取函数的参数
+  const getParameters = (fn) => {
+      if (typeof fn !== 'function')
+          return [];
+      // 获取代码片段
+      const fnStr = fn
+          .toString()
+          // 移除注释
+          .replace(/((\/\/.*$)|(\/\*[\s\S]*?\*\/))/gm, '')
+          .trim();
+      // 根据函数类型（普通/箭头）使用不同的匹配方法匹配参数配置片段
+      const args = fnStr.match(fnStr.startsWith('function')
+          // 普通函数
+          ? /^function.*?\(([^)]*)\)/
+          // 箭头函数
+          : /^\(?([^)]*)\)?.*?=>/);
+      if (!args)
+          return [];
+      return args[1]
+          .split(',')
+          .map((arg) => arg.replace(/\/\*.*\*\//, '').trim())
+          .filter(Boolean);
+  };
+  const createWorker = (creator) => {
+      const [assistName] = getParameters(creator);
+      console.log(assistName);
+  };
   var index = createAssistWorker();
 
-  return index;
+  exports.createWorker = createWorker;
+  exports.default = index;
+
+  Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
