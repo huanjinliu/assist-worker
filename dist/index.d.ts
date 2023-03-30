@@ -1,4 +1,11 @@
 /**
+ * worker线程内部操作方法
+ */
+export type WorkerMethods = {
+    postMessage?: Worker['postMessage'];
+    close?: () => void;
+};
+/**
  * Web Workers辅助者，提供极少API使你能更灵活地在编码中使用Web Workers
  */
 type AssistWorker = {
@@ -20,7 +27,7 @@ type AssistWorker = {
      * @returns {object} 用于控制工作流程执行和线程关闭的对象
      */
     create: <T extends (...args: any) => any>(job: T) => {
-        run: (...args: Parameters<T> extends [...infer P, infer Q] ? P : never) => Promise<ReturnType<T>>;
+        run: (...args: Parameters<T> extends [...infer P, infer Q] ? Q extends WorkerMethods ? P : Parameters<T> : never) => Promise<ReturnType<T>>;
         terminate: () => void;
     };
 };

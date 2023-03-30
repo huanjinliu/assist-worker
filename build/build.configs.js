@@ -3,7 +3,7 @@ import babel from '@rollup/plugin-babel';
 import commonjs from '@rollup/plugin-commonjs';
 import clear from 'rollup-plugin-clear';
 import typescript from '@rollup/plugin-typescript';
-import pkg from '../package.json' assert { type: 'json'};
+import pkg from '../package.json' assert { type: 'json' };
 
 const config = {
   input: 'src/index.ts',
@@ -11,25 +11,27 @@ const config = {
     {
       file: pkg.brower,
       format: 'umd',
-      name: 'assistWorker'
+      name: 'assistWorker',
     },
     {
       file: pkg.module,
-      format: 'esm'
-    }
+      format: 'esm',
+    },
   ],
   plugins: [
     clear({
       targets: ['dist'],
-      watch: process.env.ROLLUP_WATCH === 'true'
+      watch: process.env.ROLLUP_WATCH === 'true',
     }),
     resolve(),
     commonjs(),
-    typescript(),
+    typescript({
+      exclude: ['src/example/**/*'],
+    }),
     babel({
-      babelHelpers: 'bundled'
-    })
-  ]
+      babelHelpers: 'bundled',
+    }),
+  ],
 };
 
 export default config;

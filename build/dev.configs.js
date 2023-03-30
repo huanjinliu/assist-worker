@@ -10,7 +10,7 @@ const config = {
   output: [
     {
       file: 'public/index.js',
-      format: 'iife'
+      format: 'iife',
     }
   ],
   plugins: [
@@ -26,7 +26,7 @@ const config = {
       open: true,
       contentBase: 'public/',
       port: 8080,
-      verbose: false
+      verbose: true
     }),
     livereload({
       watch: ['public'],

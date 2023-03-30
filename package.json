@@ -12,10 +12,10 @@
   "author": "huanjin",
   "homepage": "https://github.com/huanjinliu/assist-worker#readme",
   "scripts": {
-    "dev": "cross-env NODE_ENV=development npm run watch --silent",
+    "dev": "cross-env NODE_ENV=development rollup --config -w",
     "build": "rollup --config",
-    "watch": "rollup --config -w --silent",
-    "prettier": "prettier --write . --loglevel silent"
+    "watch": "rollup --config -w",
+    "prettier": "prettier --write ."
   },
   "type": "module",
   "brower": "dist/assistWorker.js",

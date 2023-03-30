@@ -12,6 +12,5 @@
     "noImplicitAny": false,
     "noImplicitThis": false,
     "skipLibCheck": true
-  },
-  "exclude": ["src/example"]
+  }
 }

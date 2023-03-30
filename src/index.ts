@@ -1,5 +1,5 @@
-const WORKER_MESSAGE = 'WORKER_MESSAGE' as const;
-const JOB_RESULT = 'JOB_RESULT' as const;
+const WORKER_MESSAGE = 'WORKER_MESSAGE';
+const JOB_RESULT = 'JOB_RESULT';
 
 /**
  * worker线程内部操作方法
@@ -34,7 +34,7 @@ type AssistWorker = {
     job: T
   ) => {
     run: (
-      ...args: Parameters<T> extends [...infer P, infer Q] ? Q extends WorkerMethods ? P : [...P, Q] : never
+      ...args: Parameters<T> extends [...infer P, infer Q] ? Q extends WorkerMethods ? P : Parameters<T> : never
     ) => Promise<ReturnType<T>>;
     terminate: () => void;
   };
