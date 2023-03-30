@@ -146,7 +146,7 @@ const createAssistWorker = () => {
        * @returns {Promise<any>} 工作流程执行结果
        */
       const run = (...args) => {
-        return new Promise((resolve, reject) => {
+        return new Promise<ReturnType<T>>((resolve, reject) => {
           const index = jobs.length;
           jobs.push({
             done: (error, result) => {
