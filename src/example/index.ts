@@ -1,10 +1,10 @@
-import assistWorker from '../index';
+import { createAssistWorker } from '../index';
 
 const main = async function () {
   const numbers = [0, 1, 0, 2];
 
   // ① 使用封装方法创建worker，无需引用外部文件
-  const worker = assistWorker
+  const worker = createAssistWorker()
     // 接收并处理worker线程先主线程发送的数据
     .onMessage((message: any) => console.log(message))
     // 收集worker线程中需要用到静态数据整合对象
