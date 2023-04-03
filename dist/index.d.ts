@@ -31,5 +31,9 @@ type AssistWorker = {
         terminate: () => void;
     };
 };
-declare const _default: AssistWorker;
-export default _default;
+/**
+ * 创建一个Web Workers API封装对象
+ * @returns {object} Web Workers API封装对象
+ */
+export declare const createAssistWorker: () => AssistWorker;
+export {};

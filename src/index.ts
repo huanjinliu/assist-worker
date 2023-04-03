@@ -54,7 +54,7 @@ const isTransferables = (value: any) =>
  * 创建一个Web Workers API封装对象
  * @returns {object} Web Workers API封装对象
  */
-const createAssistWorker = () => {
+export const createAssistWorker = () => {
   // 记录所有的工作流程的执行凭证
   const jobs: {
     done: (error?: Error, result?: any) => void;
@@ -179,5 +179,3 @@ const createAssistWorker = () => {
 
   return assistWorker;
 };
-
-export default createAssistWorker();

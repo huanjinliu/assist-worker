@@ -115,6 +115,5 @@ const createAssistWorker = () => {
     };
     return assistWorker;
 };
-var index = createAssistWorker();
 
-export { index as default };
+export { createAssistWorker };

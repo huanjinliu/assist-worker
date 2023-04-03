@@ -1,8 +1,8 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-  typeof define === 'function' && define.amd ? define(factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.assistWorker = factory());
-})(this, (function () { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+  typeof define === 'function' && define.amd ? define(['exports'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.assistWorker = {}));
+})(this, (function (exports) { 'use strict';
 
   const WORKER_MESSAGE = 'WORKER_MESSAGE';
   const JOB_RESULT = 'JOB_RESULT';
@@ -121,8 +121,7 @@
       };
       return assistWorker;
   };
-  var index = createAssistWorker();
 
-  return index;
+  exports.createAssistWorker = createAssistWorker;
 
 }));
