@@ -88,7 +88,7 @@ export const createAssistWorker = () => {
             let variable =
               typeof value === 'function'
                 ? `${key}=${value};`
-                : `${key}=JSON.parse("${JSON.stringify(value)}");`;
+                : `${key}=JSON.parse(\`${JSON.stringify(value)}\`);`;
             return variablesStr + variable;
           },
           ''
