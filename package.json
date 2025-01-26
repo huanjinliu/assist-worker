@@ -1,6 +1,6 @@
 {
   "name": "assist-worker",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "providing minimal APIs to allow you to use Web Workers more flexibly in your code.",
   "keywords": [
     "assist worker",
