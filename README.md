@@ -6,6 +6,8 @@
 
 ```shell
 npm i -S assist-worker
+# or
+pnpm add assist-worker
 ```
 
 ### Usage
@@ -21,13 +23,13 @@ create and initialize `worker` threads。
 **Example**
 
 ```js
-import assistWorker from "assist-worker";
+import { createAssistWorker } from "assist-worker";
 
 const job = (param, workerMethods) => {
   console.log(param); // PARAM TO WORKER
 };
 
-const worker = assistWorker.create(job);
+const worker = createAssistWorker().create(job);
 
 // execute the job in the worker thread
 await worker.run('PARAM TO WORKER');
@@ -47,7 +49,7 @@ receive and process the message sent by the worker thread。
 **Example**
 
 ```js
-import assistWorker from "assist-worker";
+import { createAssistWorker } from "assist-worker";
 
 const job = (workerMethods) => {
   // take out the method in the object containing the worker thread internal control method
@@ -56,7 +58,7 @@ const job = (workerMethods) => {
   postMessage('MESSAGE TO MAIN')
 };
 
-const worker = assistWorker
+const worker = createAssistWorker()
   // the main thread receives and processes message
   .onMessage((message) => {
       console.log(message); // MESSAGE TO MAIN
@@ -79,12 +81,12 @@ the field name of the data must be consistent with the name used in the worker h
 **Example**
 
 ```js
-import assistWorker from "assist-worker";
+import { createAssistWorker } from "assist-worker";
 
 const numbers = [1, 2, 3, 4, 5];
 const sum = (arr) => arr.reduce((total, i) => total + i, 0);
 
-const worker = assistWorker
+const worker = createAssistWorker()
   .collect({ numbers, sum })
   .create(() => {
     console.log(sum(numbers)); // 15

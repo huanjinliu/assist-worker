@@ -46,7 +46,7 @@
         ${Object.entries(Object.fromEntries(collections)).reduce((variablesStr, [key, value]) => {
                 let variable = typeof value === 'function'
                     ? `${key}=${value};`
-                    : `${key}=JSON.parse("${JSON.stringify(value)}");`;
+                    : `${key}=JSON.parse(\`${JSON.stringify(value)}\`);`;
                 return variablesStr + variable;
             }, '')}
   
