@@ -83,12 +83,14 @@ export const createAssistWorker = () => {
       // 组合成worker脚本
       const workerScript = `
         // 将收集到的变量声明和定义加入脚本字符串，后面函数执行的时候便不会出现not defined的错误了
+        $collections = {};
         ${Object.entries(Object.fromEntries(collections)).reduce(
           (variablesStr, [key, value]) => {
-            let variable =
+            const variable = `$collections['${key}']=` + (
               typeof value === 'function'
-                ? `${key}=${value};`
-                : `${key}=JSON.parse(\`${JSON.stringify(value)}\`);`;
+                ? `${value};`
+                : `JSON.parse(\`${JSON.stringify(value)}\`);`
+            );
             return variablesStr + variable;
           },
           ''
@@ -106,6 +108,7 @@ export const createAssistWorker = () => {
   
           Promise.resolve(
             $job.apply($job, args.concat([{
+              collections: $collections,
               postMessage: (message) => postMessage({ type: '${WORKER_MESSAGE}', message }),
               close: self.close,
             }]))

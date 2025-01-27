@@ -3,6 +3,7 @@ import babel from '@rollup/plugin-babel';
 import commonjs from '@rollup/plugin-commonjs';
 import clear from 'rollup-plugin-clear';
 import typescript from '@rollup/plugin-typescript';
+import terser from '@rollup/plugin-terser';
 import pkg from '../package.json' assert { type: 'json' };
 
 const config = {
@@ -12,10 +13,12 @@ const config = {
       file: pkg.brower,
       format: 'umd',
       name: 'assistWorker',
+      sourcemap: true,
     },
     {
       file: pkg.module,
       format: 'esm',
+      sourcemap: true,
     },
   ],
   plugins: [
@@ -31,6 +34,7 @@ const config = {
     babel({
       babelHelpers: 'bundled',
     }),
+    terser(),
   ],
 };
 

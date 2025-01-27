@@ -3,6 +3,7 @@ import babel from '@rollup/plugin-babel';
 import commonjs from '@rollup/plugin-commonjs';
 import typescript from '@rollup/plugin-typescript';
 import serve from 'rollup-plugin-serve';
+import terser from '@rollup/plugin-terser';
 import livereload from 'rollup-plugin-livereload';
 
 const config = {
@@ -11,6 +12,7 @@ const config = {
     {
       file: 'public/index.js',
       format: 'iife',
+      sourcemap: true,
     }
   ],
   plugins: [
@@ -22,6 +24,7 @@ const config = {
     babel({
       babelHelpers: 'bundled'
     }),
+    terser(),
     serve({
       open: true,
       contentBase: 'public/',

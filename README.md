@@ -72,8 +72,6 @@ await worker.run();
 
 collect the main thread data that needs to be used in the worker thread. 
 
-the field name of the data must be consistent with the name used in the worker hread.
-
 `@param {object} data - the main thread data used in the worker thread`
 
 `@returns {object} assistWorker`
@@ -88,7 +86,8 @@ const sum = (arr) => arr.reduce((total, i) => total + i, 0);
 
 const worker = createAssistWorker()
   .collect({ numbers, sum })
-  .create(() => {
+  .create(({ collections }) => {
+    const { numbers, sum } = collections;
     console.log(sum(numbers)); // 15
   });
 

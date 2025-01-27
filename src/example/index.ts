@@ -10,7 +10,8 @@ const main = async function () {
     // 收集worker线程中需要用到静态数据整合对象
     .collect({ numbers })
     // 创建worker，最后一个参数是worker内部可用方法，除此都是动态参数
-    .create(async (initial: number, { postMessage, close }) => {
+    .create(async (initial: number, { collections, postMessage, close }) => {
+      const { numbers } = collections;
       // ③ 算出数值和
       let sum = initial;
       for (let i = 0, len = numbers.length; i < len; i++) {
